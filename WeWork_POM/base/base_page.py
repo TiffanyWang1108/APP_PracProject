@@ -1,45 +1,39 @@
 """
 Name : base_page.py
 Author  : Tiffany
-Time : 2022/8/30 18:18
+Time : 2022/8/31 15:16
 DESC: 
 """
-# 实例化driver, chazhao
-from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
+from appium.webdriver.webdriver import WebDriver
 from selenium.common import NoSuchElementException
 
-from WeWork.utils.log_utils import logger
+from WeWork_POM.utils.log_utils import logger
 
 
 class BasePage:
-    def setup(self):
-        # 资源初始化
-        # 打开【企业微信】应用
-        caps = {
-            "platformName": "Android",
-            "appPackage": "com.tencent.wework",
-            "appActivity": ".launch.LaunchSplashActivity",
-            "deviceName": "127.0.0.1:7555",
-            # 动态页面等待0秒,再查找元素，默认十秒
-            "settins[waitForIdleTimeout]": 0,
-            # 防止清缓存
-            "dontStopAppOnReset": "true",
-            "noReset": "true"
-        }
-        # 创建driver, 与appium server 建立连接，返回一个session
-        # driver变成self.driver 由局部变量变成实例变量，可以在其他的方法中引用这个实例变量
-        self.driver = webdriver.Remote("http://localhost:4723/wd/hub", caps)
-        self.driver.implicitly_wait(80)
+    implicity_wait_time = 30
 
-    def teardown(self):
-        self.driver.quit()
+    def __init__(self, driver: WebDriver = None):
+        self.driver = driver
+
+    def find(self, by, locator):
+        return self.driver.find_element(by, locator)
+
+    def find(self, by, locator):
+        return self.driver.find_elements(by, locator)
+
+    def set_implicity(self,second):
+        self.driver.implicitly_wait(second)
 
     def swipe_find(self, text, num=3):
         # 自定义滑动查找
+        # self.driver.implicitly_wait(2)
+        self.set_implicity(1)
         for i in range(num):
             try:
                 ele = self.driver.find_element(AppiumBy.XPATH, f"//*[@text='{text}']")
+                self.driver.implicitly_wait(self.implicity_wait_time)
                 return ele
             except:
                 logger.info("未找到元素，开始滑动")
